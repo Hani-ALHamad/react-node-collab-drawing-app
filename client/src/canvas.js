@@ -2,12 +2,16 @@ import React, { useContext, useEffect } from 'react';
 import { AppContext } from "./context";
 
 const Canvas = () => {
+  const canv = document.getElementsByTagName("canvas")[0]
+  var old
+
   const {
     ctx,
     changeCtx,
     canvas,
     changeCanvas,
-    socket
+    socket,
+    room
   } = useContext(AppContext)
 
   var x = 0
@@ -15,6 +19,7 @@ const Canvas = () => {
 
   useEffect(() => {
     const canv= document.createElement('canvas')
+    
     changeCanvas(canv)
     // document.body.appendChild(canv)
     document.getElementsByClassName("canvas_main")[0].appendChild(canv)
@@ -45,13 +50,14 @@ const Canvas = () => {
     ctx.moveTo(x, y)
     ctx.lineTo(x, y)
     ctx.stroke()
-    // socket.emit("sendMessage", {x: x, y: y, w: 5, o: "s"}, () => {
-    //   console.log("sent")
-    // })
+    socket.emit("sendCanvas", [x, y, 5, "red", room], () => {
+      console.log("sent")
+    })
   }
 
   const draw = (e) => {
     if(e.buttons === 1){
+      console.log("a")
       ctx.beginPath()
       ctx.moveTo(x, y)
       x = e.offsetX
@@ -61,7 +67,7 @@ const Canvas = () => {
       // socket.emit("sendMessage", { x: x, y: y }, () => {
       //   console.log("sent")
       // })
-      socket.emit("sendMessage", { x: x, y: y, w: 5, o: "s" }, () => {
+      socket.emit("sendCanvas", [x, y, 5, "red", room], () => {
         console.log("sent")
       })
     }
@@ -69,6 +75,8 @@ const Canvas = () => {
 
   const mouseUp = () => {
     console.log("m up")
+    old = null
+    socket.emit("clearOld", room)
     // console.log(canvas.toDataURL())
   }
 
@@ -80,6 +88,39 @@ const Canvas = () => {
     }
   },[ctx])
 
+  useEffect(() => {
+    var x
+    var y
+    
+    socket.on("sendCanvasToUsers", (data) => {
+      if (ctx) {
+
+        if(!old){
+          console.log("sssssssssssssssssssssssssssssss")
+          old = [data[0], data[1]]
+        }
+        // console.log(ctx)
+        console.log(data)
+        ctx.beginPath()
+        ctx.moveTo(old[0], old[1])
+        x = canv.offsetX
+        y = canv.offsetY
+        ctx.lineTo(data[0], data[1])
+        ctx.stroke()
+        old = [data[0], data[1]]
+      }
+      
+
+    })
+
+    socket.on("clearOldForUsers", () => {
+      old = undefined
+    })
+  }, [socket, ctx])
+
+  useEffect(() => {
+
+  },[])
   
   return (
     <div className='canvas_main'>

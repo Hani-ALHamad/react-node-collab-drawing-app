@@ -1,11 +1,11 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Chat from './chat';
 import { AppContext } from "./context";
 import { FaPaintBrush, FaEraser } from 'react-icons/fa'
 
 
 const Tools = () => {
-
+  const { role } = useContext(AppContext)
 
   return (
     <div className='tools_main'>
@@ -22,7 +22,11 @@ const Tools = () => {
           <input className='tools_color_input' type="color" />
         </div>
         <button className='tools_button_icon'><FaEraser /></button>
-        <button className='tools_button'>Clear All</button>
+        {role === "leader" ? 
+          <button className='tools_button'>Clear All</button>
+        :
+          <button className='tools_button'>Clear All</button>
+        }
         <div className='tools_color'>
           Background color
           <input className='tools_color_input'  type="color" />

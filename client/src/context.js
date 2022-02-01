@@ -1,4 +1,4 @@
-import React, {useState, useEffect, createContext} from 'react'
+import React, {useState, useEffect, createContext, useCallback} from 'react'
 import io from 'socket.io-client'
 import { format } from 'timeago.js'
 
@@ -12,6 +12,9 @@ const Context = ({children}) => {
   const [socket, changeSocket] = useState(null)
   const [usersList, changeUsersList] = useState([])
   const [role, changeRole] = useState("member")
+  const [leader, changeLeader] = useState("")
+  const [brush, changeBrush] = useState(false)
+  const [eraser, changeEraser] = useState(false)
   const [socketMessages, changeSocketMessages] = useState([])
   const [messageInput, changeMessageInput] = useState("")
   const [ctx, changeCtx] = useState(null)
@@ -25,38 +28,37 @@ const Context = ({children}) => {
   const sendMessage = (e) => {
     e.preventDefault()
     if(messageInput.trim() !== ""){
-      socket.emit("sendMessage", messageInput, () => {
-        const element = document.getElementsByClassName('chat_messages_box')[0]        
-        console.log(element.clientHeight + element.scrollTop, element.scrollHeight)
-        if (element.clientHeight + element.scrollTop - element.scrollHeight > - 20){
-          var scrollOrNot = true
-        } else {
-          scrollOrNot = false
-          document.getElementById("chat_scroll").classList.remove("chat_scroll_hidden")
-        }
-        console.log(document.getElementsByClassName('chat_messages_box')[0].clientHeight)
-        console.log(document.getElementsByClassName('chat_messages_box')[0].scrollHeight)
-        console.log(document.getElementsByClassName('chat_messages_box')[0].scrollY)
-        console.log(document.getElementsByClassName('chat_messages_box')[0].scrollTop)
-        console.log(document.getElementsByClassName('chat_messages_box')[0].clientTop)
+      changeMessageInput("")
+      socket.emit("sendMessage", {username ,messageInput, room})
+        // const element = document.getElementsByClassName('chat_messages_box')[0]        
+        // console.log(element.clientHeight + element.scrollTop, element.scrollHeight)
+        // if (element.clientHeight + element.scrollTop - element.scrollHeight > - 20){
+        //   var scrollOrNot = true
+        // } else {
+        //   scrollOrNot = false
+        //   document.getElementById("chat_scroll").classList.remove("chat_scroll_hidden")
+        // }
+        // console.log(document.getElementsByClassName('chat_messages_box')[0].clientHeight)
+        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollHeight)
+        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollY)
+        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollTop)
+        // console.log(document.getElementsByClassName('chat_messages_box')[0].clientTop)
 
 
-        const time = new Date().getTime()
-        changeSocketMessages(socketMessages.concat({ sender: "Hani", message: messageInput , time: time, formattedTime: format(time)}))
-        changeMessageInput("")
-        document.getElementById("chat_input").focus()
-        if(scrollOrNot){
-          element.scrollTo({
-            top: element.scrollHeight,
-            behavior: "smooth"
-          })
-        } else {
-          console.log("new unread messages")
-        }
-        console.log("sent")
-      })
+        // const time = new Date().getTime()
+        // changeSocketMessages(socketMessages.concat({ sender: username, message: messageInput , time: time, formattedTime: format(time)}))
+        // document.getElementById("chat_input").focus()
+        // if(scrollOrNot){
+        //   element.scrollTo({
+        //     top: element.scrollHeight,
+        //     behavior: "smooth"
+        //   })
+        // } else {
+        //   console.log("new unread messages")
+        // }
+        // console.log("sent")
+      
     }
-
   }
 
 
@@ -107,40 +109,161 @@ const Context = ({children}) => {
           changeLoading(false)
         } else {
           changeJoined(true)
+          changeSocketMessages([])
         }
       })
     }
   }
 
-  useEffect(() => {
-    const getUsersData = () => {
-      if (joined && socket) {
-        socket.emit("getUsersData", room, (users) => {
-          changeUsersList(users)
-          const exists = users.find((element) => {
-            return socket.id === element.id
-          })
-          if(exists){
-            changeRole(exists.role)
-          }
-        })
-      }
+  const getUsersData = useCallback(() => {
+    console.log("getUsersData")
+    if (joined && socket) {
+      socket.emit("getUsersData", room, (users) => {
+        changeUsersList(users)
+        console.log(usersList, users)
+        if (usersList.length === 0 && users.length === 1){
+          changeRole("leader")
+          changeLeader(users[0].username)
+        }
+        // console.log("users", users)
+        // console.log(usersList)
+        // const exists = users.find((element) => {
+        //   return socket.id === element.id
+        // })
+        // if (exists) {
+        //   changeBrush(exists.brush)
+        //   changeEraser(exists.eraser)
+        //   changeRole(exists.role)
+        //   console.log(users, usersList)
+        //   const roomLeader = users.find((user) => {
+        //     return user.role === "leader"
+        //   })
+        //   changeLeader(roomLeader.username)
+        // } else {
+        //   changeJoined(false)
+        //   changeLoading(false)
+        // }
+      })
     }
+  },[joined, room, socket, usersList])
+
+  useEffect(() => {
       const interval = setInterval(() => {
         getUsersData()
-        }, 1000)
+        }, 20000)
       getUsersData()
       return () => clearInterval(interval)
   },[socket, joined, room, role])
 
   useEffect(() => {
+    
     const message = (m) => {
       console.log(m)
     }
-    if(socket){
-      socket.on("systemMessage", message)
+
+    const sendMessageToRoom = (data) => {
+      console.log(data)
+      const element = document.getElementsByClassName('chat_messages_box')[0]
+      if (element.clientHeight + element.scrollTop - element.scrollHeight > - 20) {
+        var scrollOrNot = true
+      } else {
+        scrollOrNot = false
+      }
+      const time = new Date().getTime()
+      changeSocketMessages(socketMessages.concat({ sender: data.user, message: data.message, time: time, formattedTime: format(time) }))
+
+      setTimeout(() => {
+        if (element.clientHeight + element.scrollTop - element.scrollHeight <= - 20){
+          document.getElementById("chat_scroll").classList.remove("chat_scroll_hidden")
+        }
+      }, 300)
+
+      if (scrollOrNot) {
+        element.scrollTo({
+          top: element.scrollHeight,
+          behavior: "smooth"
+        })
+      } else {
+        console.log("new unread messages")
+      }
     }
-  },[socket])
+
+    if(socket){
+      socket.once("sendMessageToRoom", sendMessageToRoom)
+      socket.once("systemMessage", message)
+    }
+  },[socket, socketMessages])
+
+  useEffect(() => {
+    if(socket){
+      socket.once("sendUsersData", (users) => {
+        changeUsersList(users)
+        console.log(users, usersList)
+        const exists = users.find((element) => {
+          return socket.id === element.id
+        })
+        if (exists) {
+          changeBrush(exists.brush)
+          changeEraser(exists.eraser)
+          changeRole(exists.role)
+          console.log(users, usersList)
+          const roomLeader = users.find((user) => {
+            return user.role === "leader"
+          })
+          if(roomLeader){
+            changeLeader(roomLeader.username)
+          }
+        } else {
+          changeJoined(false)
+          changeLoading(false)
+          changeUsersList([])
+          changeSocketMessages([])
+          // location.reload()
+          window.location.reload()
+        }
+        console.log("second one")
+      })
+    }
+  },[socket, getUsersData, usersList, role, leader])
+
+  const handleBrushChange = (e) => {
+    console.log(e)
+    if(role === "leader"){
+      socket.emit("handleBrushChange", e)
+      getUsersData()
+    }
+  }
+
+  const handleEraserChange = (e) => {
+    console.log(e)
+    if (role === "leader") {
+      socket.emit("handleEraserChange", e)
+      getUsersData()
+    }
+  }
+
+  const handleLeave = (e) => {
+    console.log(e)
+      socket.emit("handleLeave", e)
+      getUsersData()
+      window.location.reload()
+  }
+
+  const handleKick = (e) => {
+    if (role === "leader") {
+      console.log(e)
+      socket.emit("handleKick", e)
+      getUsersData()
+    }
+  }
+
+  const handlePromoting = (e) => {
+    if (role === "leader") {
+      console.log(e)
+      socket.emit("handlePromoting", e)
+    }
+  }
+
 
 
   return(
@@ -165,7 +288,17 @@ const Context = ({children}) => {
       room,
       changeRoom,
       handleSubmit,
-      loading
+      loading,
+      usersList,
+      role,
+      leader,
+      brush,
+      eraser,
+      handleBrushChange,
+      handleEraserChange,
+      handleLeave,
+      handleKick,
+      handlePromoting
     }}>
       {children}
     </AppContext.Provider>

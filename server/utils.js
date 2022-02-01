@@ -20,11 +20,15 @@ const newUser = ({id, username, room}) => {
 
   if(usersInRoom.length === 0){
     var role = "leader"
+    var brush = true
+    var eraser = true
   } else {
     role = "member"
+    brush = false
+    eraser = false
   }
   console.log(usersInRoom)
-  users.push({ id, username: username.trim(), room: room.trim(), role })
+  users.push({ id, username: username.trim(), room: room.trim(), role, brush, eraser })
   return {users}
 }
 
