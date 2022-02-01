@@ -83,6 +83,7 @@ const Canvas = () => {
   useEffect(() => {
     if(ctx){
       document.getElementsByTagName("canvas")[0].addEventListener("mousedown", setPosition)
+      document.getElementsByTagName("canvas")[0].addEventListener("touchstart", setPosition)
       document.getElementsByTagName("canvas")[0].addEventListener("mousemove", draw)
       document.getElementsByTagName("canvas")[0].addEventListener("touchmove", draw)
       document.addEventListener("mouseup", mouseUp)
