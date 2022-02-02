@@ -122,12 +122,15 @@ io.on('connection', (socket) => {
 
   socket.on("sendCanvas", (data) => {
     console.log(data)
-    if(data.length === 5)
-    socket.broadcast.to(data[4]).emit("sendCanvasToUsers", data)
+      socket.broadcast.to(data[0]).emit("sendCanvasToUsers", data)
   })
 
   socket.on("clearOld", (room) => {
     socket.broadcast.to(room).emit("clearOldForUsers")
+  })
+
+  socket.on("clearCanvas", (room) => {
+    io.to(room).emit("clearCanvasToUsers")
   })
 })
 

@@ -8,6 +8,8 @@
   --purple-clr: #5900ff;
   --gold-clr: #FFD700;
   --red-clr: rgb(201, 0, 0);
+  --brush-clr: black;
+  --bg-clr: #F4F4F9;
   --light-shadow: drop-shadow(5px 5px 3px rgba(0,0,0, 0.2));
   --medium-shadow: drop-shadow(5px 5px 10px rgba(0,0,0, 0.4));
   --medium-shadow-white: drop-shadow(0px 0px 10px #F4F4F9);
@@ -116,6 +118,11 @@ body {
   filter: var(--medium-shadow-white);
 }
 
+.welcome_err {
+  text-align: center;
+  font-size: 1.2rem;
+  min-height: 35px;
+}
 
 /* loadingPage */
 
@@ -331,6 +338,11 @@ canvas {
   transition: 0.3s all;
 }
 
+.white_bg {
+  background-color: var(--ghost-white-clr);
+  color: var(--nearly-black-clr);
+}
+
 .tools_button_icon:hover {
   filter: var(--medium-shadow-white);
 }
@@ -357,7 +369,14 @@ canvas {
   text-align: center;
 }
 
-.tools_color_input {
+.tools_color_input_1 {
+  width: 96%;
+  border: none;
+  background: transparent; 
+  transition: 0.3s all;
+}
+
+.tools_color_input_2 {
   width: 96%;
   border: none;
   background: transparent; 
@@ -368,8 +387,12 @@ canvas {
   width: 96%;
 }
 
-.tools_color_input:hover {
-  filter: var(--medium-shadow-white);
+.tools_color_input_1:hover {
+  filter: drop-shadow(0px 0px 10px var(--brush-clr));
+}
+
+.tools_color_input_2:hover {
+  filter: drop-shadow(0px 0px 10px var(--bg-clr));
 }
 
 .tools_row {

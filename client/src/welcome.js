@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { AppContext } from "./context";
 
 const Welcome = () => {
-  const { handleSubmit, username, changeUsername, room, changeRoom, loading } = useContext(AppContext)
+  const { handleSubmit, username, changeUsername, room, changeRoom, loading, loginError } = useContext(AppContext)
 
   return (
     <div className='welcome_main'>
@@ -34,6 +34,7 @@ const Welcome = () => {
           <div className='loading_page_circle' />
       }
       </form>
+      <div className='welcome_err'>{loginError}</div>
     </div>
   )
 }

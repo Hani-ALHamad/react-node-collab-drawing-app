@@ -21,14 +21,14 @@ const App = () => {
     username,
     changeUsername,
     room,
-    changeRoom
+    changeRoom,
+    bigLoading
   } = useContext(AppContext)
 
 
   console.log(window.innerHeight)
 
   
-
 
 
   if(!joined){
@@ -39,6 +39,7 @@ const App = () => {
     )
   }
 
+  
   return(
       <div className='main'>
       <div className='question' onClick={e => changeInfo(true)}><FaQuestionCircle /></div>

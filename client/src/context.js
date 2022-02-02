@@ -7,6 +7,7 @@ export const AppContext = createContext()
 const Context = ({children}) => {
   const [joined, changeJoined] = useState(false)
   const [loading, changeLoading] = useState(false)
+  const [loginError, changeLoginError] = useState("")
   const [username, changeUsername] = useState("")
   const [room, changeRoom] = useState("")
   const [socket, changeSocket] = useState(null)
@@ -15,6 +16,10 @@ const Context = ({children}) => {
   const [leader, changeLeader] = useState("")
   const [brush, changeBrush] = useState(false)
   const [eraser, changeEraser] = useState(false)
+  const [brushMode, changeBrushMode] = useState("brush")
+  const [brushWidth, changeBrushWidth] = useState(5)
+  const [brushColor, changeBrushColor] = useState("black")
+  const [bgColor, changeBgColor] = useState("#F4F4F9")
   const [socketMessages, changeSocketMessages] = useState([])
   const [messageInput, changeMessageInput] = useState("")
   const [ctx, changeCtx] = useState(null)
@@ -98,6 +103,7 @@ const Context = ({children}) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if(username.trim() !== "" && room.trim() !== ""){
+      changeLoginError("")
       document.getElementsByTagName("input")[0].disabled = true
       document.getElementsByTagName("input")[1].disabled = true
       changeLoading(true)
@@ -106,6 +112,7 @@ const Context = ({children}) => {
           document.getElementsByTagName("input")[0].disabled = false
           document.getElementsByTagName("input")[1].disabled = false
           console.log(error)
+          changeLoginError(error)
           changeLoading(false)
         } else {
           changeJoined(true)
@@ -264,6 +271,33 @@ const Context = ({children}) => {
     }
   }
 
+  const handleClearCanvas = () => {
+    if (role === "leader"){
+      socket.emit("clearCanvas", room)
+    }
+  }
+
+  useEffect(() => {
+    if(socket && ctx){
+      socket.on("clearCanvasToUsers", () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+      })
+    }
+  }, [socket, ctx, canvas, role])
+
+  useEffect(() => {
+    if(joined){
+      document.documentElement.style.setProperty("--brush-clr", brushColor)
+    }
+  },[brushColor, joined])
+
+  useEffect(() => {
+    if (joined) {
+      document.documentElement.style.setProperty("--bg-clr", bgColor)
+      document.getElementsByClassName("canvas_main")[0].style.setProperty("background", bgColor)
+    }
+  }, [bgColor, joined])
+
 
 
   return(
@@ -298,7 +332,17 @@ const Context = ({children}) => {
       handleEraserChange,
       handleLeave,
       handleKick,
-      handlePromoting
+      handlePromoting,
+      loginError,
+      brushMode, 
+      changeBrushMode,
+      brushWidth, 
+      changeBrushWidth,
+      brushColor, 
+      changeBrushColor,
+      bgColor, 
+      changeBgColor,
+      handleClearCanvas
     }}>
       {children}
     </AppContext.Provider>
