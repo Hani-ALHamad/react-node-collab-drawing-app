@@ -8,7 +8,7 @@ A real time collaborative drawing app that uses [socket.io](https://www.npmjs.co
 - Rooms system: users can join rooms and each room can take up to 5 users.   
 - Leader role: 1 user can be the leader of a room, leader does have permissions like kicking, promoting and allowing others to use drawing brush or eraser.   
 - The app does handle disconnecting/leaving, for example if the leader left then someone else will get promoted to leader automatically.   
-- Tools box: brush, brush width, brush color, eraser, clear board for all (only leader can use it), change background color (locally).
+- Tools box: brush, brush width (eraser width as well), brush color, eraser, clear board for all (only leader can use it), change background color (locally).
 - Real time chat: with time ago feature using [timeago.js](https://www.npmjs.com/package/timeago.js), system messages whenever someone joins or leaves or gets promoted, smooth auto scrolling and the ability to scroll up to catch up with old unread messages.
 
 ***Packages and tech i used to make this app:***   
