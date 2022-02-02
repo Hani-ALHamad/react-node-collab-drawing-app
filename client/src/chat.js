@@ -1,26 +1,20 @@
 import React, { useContext, useEffect } from 'react';
 import { AppContext } from "./context";
 import {format} from 'timeago.js'
-import { FaCrown, FaEraser, FaPaintBrush } from 'react-icons/fa'
+import { FaCrown } from 'react-icons/fa'
 import ChatInput from './chatInput';
 
 const Chat = () => {
   const {
-    socket,
-    changeSocket,
     socketMessages,
     changeSocketMessages,
-    sendMessage,
-    messageInput, 
-    changeMessageInput,
     scrollDown,
-    usersList,
     leader
   } = useContext(AppContext)
 
 
   
-  
+  // this will update the time ago each one minute, using "timeago.js" npm
   useEffect(() => {
       const interval = setInterval(() => {
         socketMessages.forEach((item) => {
@@ -55,7 +49,6 @@ const Chat = () => {
             :
               <div className='chat_message'>{item.message}</div>
             }
-            
           </>
         ))}
       </div>

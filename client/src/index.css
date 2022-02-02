@@ -34,19 +34,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--nearly-black-clr);
   color: white;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
   width: var(--screen-width);
   height: var(--screen-height);
-
 }
 
 .main {
   display: flex;
-  /* justify-content: center; */
   align-items: center;
-    width: var(--screen-width);
+  width: var(--screen-width);
   height: var(--screen-height);
   position: relative;
 }
@@ -163,15 +158,9 @@ body {
   height: 920px;
   margin-left: 1.5rem;
   justify-self: flex-start;
-  /* width: 1000px;
-  height: 600px; */
-        /* width: var(--screen-width);
-  height: var(--screen-height); */
   position: absolute;
   left: 0%;
   transform: translateX(calc((var(--screen-width) - 1920px)/2.3))  scale(calc(var(--screen-width-scale) / (1920 + 100) ));
-  /* transform: ; */
-  /* transition: 0.3s all; */
 }
 
 canvas {
@@ -191,11 +180,8 @@ canvas {
   background-color: var(--nearly-black-clr);
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: center;
   filter: var(--light-shadow-white);
-  /* transition: 0.3s all; */
-
 }
 
 
@@ -448,8 +434,6 @@ canvas {
   font-family: var(--general-font);
   font-weight: 400;
   font-size: 1rem;
-  /* justify-self: center;
-  align-self: center; */
   background-color: var(--ghost-white-clr);
   color: var(--nearly-black-clr);
   border: none;

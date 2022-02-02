@@ -25,48 +25,24 @@ const Context = ({children}) => {
   const [ctx, changeCtx] = useState(null)
   const [canvas, changeCanvas] = useState(null)
   const [info, changeInfo] = useState(false)
+
+  // this will initiate a new socket.io connection
   useEffect(() => {
     const newSocket = io("/")
     changeSocket(newSocket)
   }, [changeSocket])
 
+  // this will emit messages to the backend
   const sendMessage = (e) => {
     e.preventDefault()
     if(messageInput.trim() !== ""){
       changeMessageInput("")
       socket.emit("sendMessage", {username ,messageInput, room})
-        // const element = document.getElementsByClassName('chat_messages_box')[0]        
-        // console.log(element.clientHeight + element.scrollTop, element.scrollHeight)
-        // if (element.clientHeight + element.scrollTop - element.scrollHeight > - 20){
-        //   var scrollOrNot = true
-        // } else {
-        //   scrollOrNot = false
-        //   document.getElementById("chat_scroll").classList.remove("chat_scroll_hidden")
-        // }
-        // console.log(document.getElementsByClassName('chat_messages_box')[0].clientHeight)
-        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollHeight)
-        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollY)
-        // console.log(document.getElementsByClassName('chat_messages_box')[0].scrollTop)
-        // console.log(document.getElementsByClassName('chat_messages_box')[0].clientTop)
-
-
-        // const time = new Date().getTime()
-        // changeSocketMessages(socketMessages.concat({ sender: username, message: messageInput , time: time, formattedTime: format(time)}))
-        // document.getElementById("chat_input").focus()
-        // if(scrollOrNot){
-        //   element.scrollTo({
-        //     top: element.scrollHeight,
-        //     behavior: "smooth"
-        //   })
-        // } else {
-        //   console.log("new unread messages")
-        // }
-        // console.log("sent")
-      
     }
   }
 
 
+  // handle scrolling button
   useEffect(() => {
     if(joined){
       const element = document.getElementsByClassName('chat_messages_box')[0]
@@ -78,6 +54,7 @@ const Context = ({children}) => {
     }
   },[joined])
 
+  // scrolling button
   const scrollDown = () => {
     const element = document.getElementsByClassName('chat_messages_box')[0]
     element.scrollTo({
@@ -86,20 +63,20 @@ const Context = ({children}) => {
     })
   }
 
+  // to check screen width and heigh, and change their :root variables in css
   useEffect(() => {
     if(joined){
       const checkSize = () => {
         document.querySelector(':root').style.setProperty("--screen-width-scale", `${window.innerWidth}`)
         document.querySelector(':root').style.setProperty("--screen-width", `${window.innerWidth}px`)
         document.querySelector(':root').style.setProperty("--screen-height", `${window.innerHeight}px`)
-        console.log(window.innerWidth, window.innerHeight)
-        console.log("s")
       }
       window.addEventListener("resize", checkSize)
       checkSize()
     }
   },[joined])
 
+  // to submit your data when you try to login, will emit them to the backend for sure
   const handleSubmit = (e) => {
     e.preventDefault()
     if(username.trim() !== "" && room.trim() !== ""){
@@ -111,7 +88,6 @@ const Context = ({children}) => {
         if(error) {
           document.getElementsByTagName("input")[0].disabled = false
           document.getElementsByTagName("input")[1].disabled = false
-          console.log(error)
           changeLoginError(error)
           changeLoading(false)
         } else {
@@ -122,38 +98,21 @@ const Context = ({children}) => {
     }
   }
 
+  // to get users data from the backend, will trigger another emit function there to make sure all users will be updated with the new data
   const getUsersData = useCallback(() => {
-    console.log("getUsersData")
     if (joined && socket) {
       socket.emit("getUsersData", room, (users) => {
         changeUsersList(users)
-        console.log(usersList, users)
         if (usersList.length === 0 && users.length === 1){
           changeRole("leader")
           changeLeader(users[0].username)
         }
-        // console.log("users", users)
-        // console.log(usersList)
-        // const exists = users.find((element) => {
-        //   return socket.id === element.id
-        // })
-        // if (exists) {
-        //   changeBrush(exists.brush)
-        //   changeEraser(exists.eraser)
-        //   changeRole(exists.role)
-        //   console.log(users, usersList)
-        //   const roomLeader = users.find((user) => {
-        //     return user.role === "leader"
-        //   })
-        //   changeLeader(roomLeader.username)
-        // } else {
-        //   changeJoined(false)
-        //   changeLoading(false)
-        // }
       })
     }
   },[joined, room, socket, usersList])
 
+
+  // auto updating for data (getUsersData) function
   useEffect(() => {
       const interval = setInterval(() => {
         getUsersData()
@@ -162,14 +121,10 @@ const Context = ({children}) => {
       return () => clearInterval(interval)
   },[socket, joined, room, role])
 
-  useEffect(() => {
-    
-    const message = (m) => {
-      console.log(m)
-    }
 
+  // auto scrolling + adding time to messages and adding them to the state + emitting messages to the backend
+  useEffect(() => {
     const sendMessageToRoom = (data) => {
-      console.log(data)
       const element = document.getElementsByClassName('chat_messages_box')[0]
       if (element.clientHeight + element.scrollTop - element.scrollHeight > - 20) {
         var scrollOrNot = true
@@ -190,22 +145,20 @@ const Context = ({children}) => {
           top: element.scrollHeight,
           behavior: "smooth"
         })
-      } else {
-        console.log("new unread messages")
       }
     }
 
     if(socket){
       socket.once("sendMessageToRoom", sendMessageToRoom)
-      socket.once("systemMessage", message)
     }
   },[socket, socketMessages])
 
+
+  // this will recieve the data from the backend whenever they were updated or requested
   useEffect(() => {
     if(socket){
       socket.once("sendUsersData", (users) => {
         changeUsersList(users)
-        console.log(users, usersList)
         const exists = users.find((element) => {
           return socket.id === element.id
         })
@@ -213,7 +166,6 @@ const Context = ({children}) => {
           changeBrush(exists.brush)
           changeEraser(exists.eraser)
           changeRole(exists.role)
-          console.log(users, usersList)
           const roomLeader = users.find((user) => {
             return user.role === "leader"
           })
@@ -225,58 +177,57 @@ const Context = ({children}) => {
           changeLoading(false)
           changeUsersList([])
           changeSocketMessages([])
-          // location.reload()
           window.location.reload()
         }
-        console.log("second one")
       })
     }
   },[socket, getUsersData, usersList, role, leader])
 
+  // to change brush permissions
   const handleBrushChange = (e) => {
-    console.log(e)
     if(role === "leader"){
       socket.emit("handleBrushChange", e)
       getUsersData()
     }
   }
-
+  // to change eraser permissions
   const handleEraserChange = (e) => {
-    console.log(e)
     if (role === "leader") {
       socket.emit("handleEraserChange", e)
       getUsersData()
     }
   }
 
+  // to handle leaving
   const handleLeave = (e) => {
-    console.log(e)
       socket.emit("handleLeave", e)
       getUsersData()
       window.location.reload()
   }
 
+  // to kick another user
   const handleKick = (e) => {
     if (role === "leader") {
-      console.log(e)
       socket.emit("handleKick", e)
       getUsersData()
     }
   }
 
+  // to promote another user
   const handlePromoting = (e) => {
     if (role === "leader") {
-      console.log(e)
       socket.emit("handlePromoting", e)
     }
   }
 
+  // to clear the board for everyone
   const handleClearCanvas = () => {
     if (role === "leader"){
       socket.emit("clearCanvas", room)
     }
   }
 
+  // this will trigger when the leader request board clearing
   useEffect(() => {
     if(socket && ctx){
       socket.on("clearCanvasToUsers", () => {
@@ -285,6 +236,7 @@ const Context = ({children}) => {
     }
   }, [socket, ctx, canvas, role])
 
+  
   useEffect(() => {
     if(joined){
       document.documentElement.style.setProperty("--brush-clr", brushColor)

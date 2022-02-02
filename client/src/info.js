@@ -1,10 +1,10 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { AppContext } from "./context";
 import { FaCrown, FaEraser, FaPaintBrush } from 'react-icons/fa'
 import { AiOutlineClose } from 'react-icons/ai'
 
 const Info = () => {
-  const { info, changeInfo } = useContext(AppContext)
+  const { changeInfo } = useContext(AppContext)
 
   return (
     <div className='info_main'>

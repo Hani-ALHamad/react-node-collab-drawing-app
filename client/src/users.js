@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Chat from './chat';
+import React, { useContext } from 'react';
 import { AppContext } from "./context";
 import { FaCrown, FaEraser, FaPaintBrush } from 'react-icons/fa'
 import { ImExit } from 'react-icons/im'
@@ -11,8 +10,6 @@ const Users = () => {
     role,
     socket,
     room,
-    brush,
-    eraser,
     handleBrushChange,
     handleEraserChange,
     handleLeave,

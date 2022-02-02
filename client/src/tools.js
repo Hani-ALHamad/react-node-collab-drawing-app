@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Chat from './chat';
+import React, { useContext } from 'react';
 import { AppContext } from "./context";
 import { FaPaintBrush, FaEraser } from 'react-icons/fa'
 

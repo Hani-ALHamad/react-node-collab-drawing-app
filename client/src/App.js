@@ -1,36 +1,20 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 import './index.css';
 import { AppContext } from "./context";
-import Chat from './chat';
 import Canvas from './canvas';
 import Welcome from './welcome';
-import LoadingPage from './loadingPage'
 import Sidebar from './sidebar';
 import Info from './info';
 import { FaQuestionCircle } from 'react-icons/fa'
 
 const App = () => {
   const {
-    socket,
-    changeSocket,
-    socketMessage,
-    changeSocketMessage,
     info, 
     changeInfo,
     joined,
-    username,
-    changeUsername,
-    room,
-    changeRoom,
-    bigLoading
   } = useContext(AppContext)
 
-
-  console.log(window.innerHeight)
-
-  
-
-
+  // if user is not in a room the welcome page will show
   if(!joined){
     return (
       <div className='main'>
@@ -46,11 +30,7 @@ const App = () => {
         {info ? <Info /> : <></>}
         <Canvas />
         <Sidebar />
-        {/* <LoadingPage /> */}
-        {/* <Welcome /> */}
-          
       </div>
-
   )
 }
 

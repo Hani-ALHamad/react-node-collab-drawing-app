@@ -14,9 +14,11 @@ const io = socketio(server)
 
 app.use(express.json())
 
-
+// io connection (container)
 io.on('connection', (socket) => {
   console.log("new connection")
+
+  // when someone tries to join
   socket.on("tryToJoin", (data, callback) => {
     const user = newUser({id:socket.id, username: data.username, room: data.room})
     if(user.error){
@@ -30,7 +32,7 @@ io.on('connection', (socket) => {
     callback()
   })
 
-
+  // when someone disconnects (refreshes the page, or closes the tab)
   socket.on("disconnect", () => {
     const user = removeUser(socket.id)
     if (user) {
@@ -40,26 +42,25 @@ io.on('connection', (socket) => {
         socket.broadcast.to(user.room).emit("sendMessageToRoom", { user: "", message: `${user.username} was disconnected from the room.` })
         if(user.role === "leader") {
           users[0].role = "leader"
-          socket.broadcast.to(user.room).emit("sendMessageToRoom", { user: "", message: `${users[0].username} was promoted to leader.` })
+          socket.broadcast.to(user.room).emit("sendMessageToRoom", { user: "", message: `${users[0].username} was promoted to leader. Please wait for few seconds to get the leader permissions.` })
         }
       }
     }
   })
 
+  // to get users data and send them to room users
   socket.on("getUsersData", (room, callback) => {
     const users = getRoomUsers(room)
     socket.broadcast.to(room).emit("sendUsersData", users)
     callback(users)
   })
 
+  // on sending messages
   socket.on('sendMessage', (data) => {
-    // console.log(data)
-    console.log(socket.id)
-    console.log(socket.rooms)
-    console.log(io.sockets.adapter.rooms.has(data.room))
     io.to(data.room).emit("sendMessageToRoom", {user: data.username ,message: data.messageInput})
   })
 
+  // on brush permission change
   socket.on("handleBrushChange", (data) => {
     const user = getUser(data.id)
     if(user){
@@ -69,6 +70,7 @@ io.on('connection', (socket) => {
     }
   })
 
+  // on eraser permission change
   socket.on("handleEraserChange", (data) => {
     const user = getUser(data.id)
     if (user) {
@@ -78,6 +80,7 @@ io.on('connection', (socket) => {
     }
   })
 
+  // when someone leaves, if leader left the permession will be given to someone else (users[0])
   socket.on("handleLeave", (data) => {
     const user = removeUser(data.id)
     const users = getRoomUsers(data.room)
@@ -89,13 +92,11 @@ io.on('connection', (socket) => {
       } else {
         socket.broadcast.to(user.room).emit("sendMessageToRoom", { user: "", message: `${user.username} left the room.` })
       }
-      console.log("sent", user.room)
-      console.log(users)
       io.to(user.room).emit("sendUsersData", users)
     }
   })
 
-
+  // when somone gets kicked out
   socket.on("handleKick", (data) => {
     const user = removeUser(data.id)
     const users = getRoomUsers(data.room)
@@ -103,10 +104,9 @@ io.on('connection', (socket) => {
         io.to(user.room).emit("sendMessageToRoom", { user: "", message: `${user.username} was kicked from the room.` })
         io.to(user.room).emit("sendUsersData", users)
       }
-      console.log("sent", user.room)
-      console.log(users)
     })
 
+  // when someone gets promoted
   socket.on("handlePromoting", (data) => {
     const prevLeader = getUser(socket.id)
     const user = getUser(data.id)
@@ -119,16 +119,17 @@ io.on('connection', (socket) => {
     }
   })
 
-
+  // sends canvas (x, y, brush width, brush color) to other users
   socket.on("sendCanvas", (data) => {
-    console.log(data)
       socket.broadcast.to(data[0]).emit("sendCanvasToUsers", data)
   })
 
+  // sends an order to all clients to clear "old" variable in canvas.js file
   socket.on("clearOld", (room) => {
     socket.broadcast.to(room).emit("clearOldForUsers")
   })
 
+  // makes everyone in the room clear their canvas
   socket.on("clearCanvas", (room) => {
     io.to(room).emit("clearCanvasToUsers")
   })

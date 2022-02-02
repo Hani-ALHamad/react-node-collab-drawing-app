@@ -1,6 +1,5 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import Chat from './chat';
-import { AppContext } from "./context";
 import Tools from './tools';
 import Users from './users';
 
