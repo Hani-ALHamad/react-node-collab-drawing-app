@@ -43,6 +43,13 @@ const Welcome = () => {
       }
       </form>
       <div className='welcome_err'>{loginError}</div>
+      <a
+        className="my_github"
+        href="https://github.com/Hani-ALHamad"
+        target="_blank"
+        rel="noreferrer">
+        My GitHub
+      </a>
     </div>
   )
 }

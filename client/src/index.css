@@ -592,3 +592,20 @@ canvas {
     font-weight: 100;
   }
 }
+
+
+
+.my_github {
+  color: white;
+  text-decoration: none;
+  font-family: var(--secondary-font);
+  font-weight: 200;
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  bottom: 0.5%;
+}
+
+.my_github:hover {
+  text-decoration: underline;
+}
