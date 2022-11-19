@@ -1,6 +1,6 @@
 # Collaborative Drawing App (reactjs & nodejs)   
 
-# • Link: https://hani-collaborative-drawing-app.herokuapp.com/   
+# • Link: https://hani-collaborative-drawing-app.up.railway.app/
 
 A real time collaborative drawing app that uses [socket.io](https://www.npmjs.com/package/socket.io) and [socket.io-client](https://www.npmjs.com/package/socket.io-client) with multiple features.
 
