@@ -23,7 +23,7 @@ A real time collaborative drawing app that uses [socket.io](https://www.npmjs.co
    
 
 ***NOTES:***   
-*If 2 or more users were drawing at the exact same time, experience might not be optimal, due to how socket.io handle things.   
+*If 2 or more users were drawing at the exact same time, experience might not be optimal, due to how socket.io handle things.    
 *Drawing board listens to mouse events only, that means it won't work with other devices like mobile phones.
 
 --- 
